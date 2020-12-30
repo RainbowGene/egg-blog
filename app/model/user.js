@@ -89,5 +89,13 @@ module.exports = app => {
     created_at: DATE,
     updated_at: DATE
   });
+
+  // 定义关联关系
+  User.associate = function (model) {
+    User.hasMany(app.model.Article, {
+      foreignKey: 'user_id'
+    });
+  }
+
   return User;
 };

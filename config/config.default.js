@@ -17,6 +17,7 @@ module.exports = appInfo => {
 
   // add your middleware config here
   config.middleware = ['errorHandler', 'auth'];
+  // config.middleware = ['errorHandler'];
 
   // 中间件的配置
   config.errorHandler = {
@@ -26,7 +27,7 @@ module.exports = appInfo => {
   };
 
   config.auth = {
-    ignore: ['/reg', '/login']  // 除了注册登录不需要使用这个中间件
+    ignore: ['/reg', '/login', '/info']  // 除了注册登录不需要使用这个中间件
   };
 
   // add your user config here

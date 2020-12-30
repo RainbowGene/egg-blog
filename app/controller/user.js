@@ -80,6 +80,43 @@ class UserController extends Controller {
     ctx.apiSuccess('退出成功！')
   }
 
+  // 我的资料(博客主人)
+  async info() {
+    const { ctx, app } = this
+    let user = await app.model.User.findOne({
+      where: {
+        id: 1,
+        status: 1
+      },
+      attributes: {
+        exclude: ['password']
+      }
+    })
+
+    ctx.apiSuccess(user)
+  }
+
+  // 查询用户基本资料
+  async read() {
+    const { ctx, app } = this
+    // let current_user_id = ctx.authUser.id; // 不需要个人资料
+    let user_id = ctx.params.id ? parseInt(ctx.params.id) : 0;
+
+    let user = await app.model.User.findOne({
+      where: {
+        id: user_id,
+        status: 1
+      },
+      attributes: {
+        exclude: ['password']
+      }
+    })
+
+    if (!user) ctx.throw(400, '不存在的用户')
+
+    ctx.apiSuccess(user)
+  }
+
   // 验证密码
   async checkPassword(password, hash_password) {
     const hmac = crypto.createHash('sha256', this.app.config.crypto.secret)
@@ -88,6 +125,32 @@ class UserController extends Controller {
     let bool = password === hash_password
     if (!bool) this.ctx.throw(400, '密码错误')
     return bool
+  }
+
+  // 用户列表
+  async list() {
+    let { ctx, app } = this
+
+    let page = ctx.query.page ? parseInt(ctx.query.page) : 1;
+    let limit = ctx.query.limit ? parseInt(ctx.query.limit) : 10;
+    let offset = (page - 1) * limit;
+
+    let rows = await app.model.User.findAll({
+      offset,
+      limit,
+      attributes: {
+        exclude: ['password']
+      }
+    });
+
+    return ctx.apiSuccess(rows);
+  }
+
+  // 获取用户总数
+  async count() {
+    let { ctx, app } = this
+    let count = await app.model.User.count(); // 记录总条数
+    return ctx.apiSuccess(count);
   }
 }
 
